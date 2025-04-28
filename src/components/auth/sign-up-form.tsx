@@ -3,13 +3,24 @@
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useForm } from 'react-hook-form';
+import { signUpSchema } from '@/schemas/auth.schema';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+type FormInput = z.infer<typeof signUpSchema>;
 
 export default function SignUpForm() {
-  const form = useForm();
+  const form = useForm<FormInput>({
+    defaultValues: { firstName: '', lastName: '', email: '', password: '', confirmPassword: '' },
+    resolver: zodResolver(signUpSchema)
+  });
+
+  const onSubmit: SubmitHandler<FormInput> = data => {};
+
   return (
     <Form {...form}>
-      <form className="flex flex-col gap-6">
+      <form className="flex flex-col gap-6" onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
           name="firstName"

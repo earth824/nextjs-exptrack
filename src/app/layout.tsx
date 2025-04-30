@@ -1,3 +1,4 @@
+import { Toaster } from '@/components/ui/sonner';
 import { APP_DESCRIPTION, APP_NAME } from '@/constants';
 import '@/styles/globals.css';
 import type { Metadata } from 'next';
@@ -21,6 +22,7 @@ export default function RootLayout({
       <body className={`${inter.className} antialiased`}>
         <ThemeProvider attribute="class" disableTransitionOnChange enableSystem={false} defaultTheme="light">
           {children}
+          <Toaster richColors expand />
         </ThemeProvider>
       </body>
     </html>

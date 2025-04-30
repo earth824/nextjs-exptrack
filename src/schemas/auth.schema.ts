@@ -20,6 +20,9 @@ export const signUpSchema = z
     path: ['confirmPassword']
   });
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
+export const signUpExcludeConfirmSchema = signUpSchema.transform(({ confirmPassword, ...rest }) => rest);
+
 export const signInSchema = z.object({
   email: z.string().min(1, 'Email is required'),
   password: z.string().min(1, 'Password is required')

@@ -7,6 +7,7 @@ import { signInCredentials } from '@/lib/actions/user.action';
 import { signInSchema } from '@/schemas/auth.schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useTransition } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -21,22 +22,27 @@ export default function SignInForm() {
   });
 
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const onSubmit: SubmitHandler<FormInput> = data => {
     startTransition(async () => {
       const result = await signInCredentials(data);
+
       if (result.isCredentialsError) {
         form.setError('email', { message: result.message });
         form.setError('password', { message: result.message });
         return;
       }
+
       if (!result.success) {
         toast.error(result.message);
         return;
       }
       if (result.success) {
-        console.log('first');
         toast.success(result.message);
+        const url = searchParams.get('callbackUrl') ?? '/';
+        router.push(url);
       }
     });
   };

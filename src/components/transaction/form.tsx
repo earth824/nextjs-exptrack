@@ -8,35 +8,41 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { transactionFormSchema } from '@/schemas/transaction.schema';
 import { ActionResult } from '@/types/action-result.type';
-import { Category, Transaction, TransactionFormInput } from '@/types/transaction.type';
+import { Category, SerializeTransactionWithCategory, TransactionFormInput } from '@/types/transaction.type';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader } from 'lucide-react';
 import Link from 'next/link';
-import { use, useEffect, useTransition } from 'react';
+import { useEffect, useTransition } from 'react';
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form';
 import { toast } from 'sonner';
 
 type CreateTransactionFormProps = {
   type: 'create';
-  transaction?: Promise<Transaction>;
+  transaction?: SerializeTransactionWithCategory;
   action: (data: TransactionFormInput) => Promise<ActionResult>;
 };
 
 type EditTransactionFormProps = {
   type: 'edit';
-  transaction: Promise<Transaction>;
+  transaction: SerializeTransactionWithCategory;
   action: (id: string, data: TransactionFormInput) => Promise<ActionResult>;
 };
 
 type TransactionFormProps = {
-  categoriesMap: Promise<{ expenses: Category[]; incomes: Category[] }>;
+  categoriesMap: { expenses: Category[]; incomes: Category[] };
 } & (CreateTransactionFormProps | EditTransactionFormProps);
 
-export default function TransactionForm({ categoriesMap, type, action }: TransactionFormProps) {
-  const { expenses, incomes } = use(categoriesMap);
+export default function TransactionForm({ categoriesMap, type, action, transaction }: TransactionFormProps) {
+  const { expenses, incomes } = categoriesMap;
 
   const form = useForm<TransactionFormInput>({
-    defaultValues: { type: 'expense', amount: '', date: new Date(), payee: '', categoryId: expenses[0].id },
+    defaultValues: {
+      type: transaction?.category.type ?? 'expense',
+      amount: transaction?.amount ?? '',
+      date: transaction?.date ?? new Date(),
+      payee: transaction?.payee ?? '',
+      categoryId: transaction?.categoryId ?? expenses[0].id
+    },
     resolver: zodResolver(transactionFormSchema)
   });
   const selectedType = useWatch({ control: form.control, name: 'type' });
@@ -46,15 +52,15 @@ export default function TransactionForm({ categoriesMap, type, action }: Transac
 
   useEffect(() => {
     if (selectedType === 'expense') {
-      form.setValue('categoryId', expenses[0].id);
+      form.setValue('categoryId', transaction?.categoryId ?? expenses[0].id);
     } else {
-      form.setValue('categoryId', incomes[0].id);
+      form.setValue('categoryId', transaction?.categoryId ?? incomes[0].id);
     }
   }, [selectedType, expenses, incomes, form]);
 
   const onSubmit: SubmitHandler<TransactionFormInput> = data => {
     startTransition(async () => {
-      const res = type === 'create' ? await action(data) : await action('', data);
+      const res = type === 'create' ? await action(data) : await action(transaction.id, data);
       if (!res.success) {
         toast.error(res.message);
       }

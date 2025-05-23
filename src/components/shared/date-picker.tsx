@@ -35,7 +35,12 @@ export default function DatePicker<
           selected={field.value}
           defaultMonth={field.value}
           onSelect={selectedDate => {
-            field.onChange(selectedDate);
+            if (selectedDate) {
+              const utcDate = new Date(selectedDate.getTime() - selectedDate.getTimezoneOffset() * 60000);
+              field.onChange(utcDate);
+            } else {
+              field.onChange(selectedDate);
+            }
             setOpen(false);
           }}
         />

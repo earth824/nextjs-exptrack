@@ -1,4 +1,5 @@
 import TransactionFilter from '@/components/transaction/filter';
+import TransactionList from '@/components/transaction/transaction-list';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -8,12 +9,7 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
+
 import {
   Pagination,
   PaginationContent,
@@ -23,8 +19,7 @@ import {
   PaginationPrevious
 } from '@/components/ui/pagination';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { EllipsisVertical, FilePlus2, Plus, Search } from 'lucide-react';
-import Image from 'next/image';
+import { Plus, Search } from 'lucide-react';
 import Link from 'next/link';
 
 export default function TransactionPage() {
@@ -78,32 +73,7 @@ export default function TransactionPage() {
         <Button variant="outline">Add Transaction</Button>
       </div> */}
 
-      <ul>
-        <li className="flex justify-between items-center border not-last:border-b-0 p-3 border-l-6 border-l-red-600">
-          <div className="flex gap-4 items-center">
-            <Image src="/images/food.png" alt="category" width={48} height={48} />
-            <div>
-              <h2 className="font-semibold">KFC</h2>
-              <span className="text-xs text-muted-foreground">1 Jan 2025</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-green-600 font-medium">&#3647; 199.00</span>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost">
-                  <EllipsisVertical />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>Duplicate</DropdownMenuItem>
-                <DropdownMenuItem>Edit</DropdownMenuItem>
-                <DropdownMenuItem>Delete</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </li>
-      </ul>
+      <TransactionList />
       <div className="flex justify-between items-center">
         <span className="text-muted-foreground text-sm">1 to 10 of 50 transactions</span>
         <div>

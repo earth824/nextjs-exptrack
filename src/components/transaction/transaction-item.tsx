@@ -1,16 +1,9 @@
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
+import TransactionItemAction from '@/components/transaction/transaction-item-action';
 import { cn, formatDecimalWithComma } from '@/lib/utils';
 import { TransactionWithCategory } from '@/types/transaction.type';
 import { format } from 'date-fns';
-import { EllipsisVertical } from 'lucide-react';
+
 import Image from 'next/image';
-import Link from 'next/link';
 
 type TransactionItemProps = {
   transaction: TransactionWithCategory;
@@ -42,26 +35,7 @@ export default function TransactionItem({ transaction }: TransactionItemProps) {
         <span className={cn('font-medium', type === 'expense' ? 'text-red-600' : 'text-green-600')}>
           &#3647; {formatDecimalWithComma(amount)}
         </span>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost">
-              <EllipsisVertical />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>
-              <Link href={`/transaction/create?id=${id}`} className="w-full">
-                Duplicate
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link href={`/transaction/${id}/edit`} className="w-full">
-                Edit
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>Delete</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <TransactionItemAction id={id} />
       </div>
     </li>
   );

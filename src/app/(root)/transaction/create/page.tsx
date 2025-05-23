@@ -1,5 +1,10 @@
 import TransactionFormLoader from '@/components/transaction/form-loader';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Create Transaction'
+};
 
 type EditTransactionPageProps = {
   searchParams: Promise<{ id?: string }>;

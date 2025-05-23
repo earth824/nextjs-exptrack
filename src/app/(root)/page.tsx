@@ -1,3 +1,9 @@
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Dashboard'
+};
+
 export default async function HomePage() {
   return (
     <div className="flex flex-col gap-4 h-full">

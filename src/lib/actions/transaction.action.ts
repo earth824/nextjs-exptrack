@@ -2,6 +2,7 @@
 
 import { getAuthUser } from '@/lib/auth';
 import prisma from '@/lib/db/prisma';
+import { simulateLoading } from '@/lib/utils';
 import { insertOrUpdateTransactionSchema } from '@/schemas/transaction.schema';
 import { ActionResult } from '@/types/action-result.type';
 import { TransactionFormInput } from '@/types/transaction.type';
@@ -34,7 +35,6 @@ export async function updateTransaction(id: string, rawData: TransactionFormInpu
     const user = await getAuthUser();
 
     const transaction = await prisma.transaction.findUnique({ where: { id } });
-
     if (!transaction) return { success: false, message: 'Transaction was not found' };
     if (transaction.userId !== user.id) return { success: false, message: 'No permission to update this transaction' };
 
@@ -45,6 +45,25 @@ export async function updateTransaction(id: string, rawData: TransactionFormInpu
     await prisma.transaction.update({ data, where: { id } });
     revalidatePath('/transaction');
     redirect('/transaction');
+  } catch (error) {
+    console.log(error);
+    if (isRedirectError(error)) {
+      throw error;
+    }
+    return { success: false, message: 'Internal server error' };
+  }
+}
+
+export async function deleteTransaction(id: string): Promise<ActionResult> {
+  try {
+    const user = await getAuthUser();
+
+    const transaction = await prisma.transaction.findUnique({ where: { id } });
+    if (!transaction) return { success: false, message: 'Transaction was not found' };
+    if (transaction.userId !== user.id) return { success: false, message: 'No permission to delete this transaction' };
+    await prisma.transaction.delete({ where: { id } });
+    revalidatePath('/transaction');
+    return { success: true, message: 'transaction successfully deleted' };
   } catch (error) {
     console.log(error);
     if (isRedirectError(error)) {

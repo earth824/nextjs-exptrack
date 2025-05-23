@@ -40,6 +40,19 @@ export const authConfig = {
       }
 
       return true;
+    },
+    jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+      }
+
+      return token;
+    },
+    session({ token, session }) {
+      if (token.id) {
+        session.user.id = token.id;
+      }
+      return session;
     }
   }
 } satisfies NextAuthConfig;

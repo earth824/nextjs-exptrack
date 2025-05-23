@@ -1,26 +1,69 @@
 'use client';
 
+import DatePicker from '@/components/shared/date-picker';
 import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { cn } from '@/lib/utils';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { format } from 'date-fns';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { transactionFormSchema } from '@/schemas/transaction.schema';
+import { ActionResult } from '@/types/action-result.type';
+import { Category, Transaction, TransactionFormInput } from '@/types/transaction.type';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Loader } from 'lucide-react';
 import Link from 'next/link';
+import { use, useEffect, useTransition } from 'react';
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form';
+import { toast } from 'sonner';
 
-export default function TransactionForm() {
-  const form = useForm({});
+type CreateTransactionFormProps = {
+  type: 'create';
+  transaction?: Promise<Transaction>;
+  action: (data: TransactionFormInput) => Promise<ActionResult>;
+};
 
-  const [open, setOpen] = useState(false);
+type EditTransactionFormProps = {
+  type: 'edit';
+  transaction: Promise<Transaction>;
+  action: (id: string, data: TransactionFormInput) => Promise<ActionResult>;
+};
+
+type TransactionFormProps = {
+  categoriesMap: Promise<{ expenses: Category[]; incomes: Category[] }>;
+} & (CreateTransactionFormProps | EditTransactionFormProps);
+
+export default function TransactionForm({ categoriesMap, type, action }: TransactionFormProps) {
+  const { expenses, incomes } = use(categoriesMap);
+
+  const form = useForm<TransactionFormInput>({
+    defaultValues: { type: 'expense', amount: '', date: new Date(), payee: '', categoryId: expenses[0].id },
+    resolver: zodResolver(transactionFormSchema)
+  });
+  const selectedType = useWatch({ control: form.control, name: 'type' });
+  const [isPending, startTransition] = useTransition();
+
+  const categories = form.getValues('type') === 'expense' ? expenses : incomes;
+
+  useEffect(() => {
+    if (selectedType === 'expense') {
+      form.setValue('categoryId', expenses[0].id);
+    } else {
+      form.setValue('categoryId', incomes[0].id);
+    }
+  }, [selectedType, expenses, incomes, form]);
+
+  const onSubmit: SubmitHandler<TransactionFormInput> = data => {
+    startTransition(async () => {
+      const res = type === 'create' ? await action(data) : await action('', data);
+      if (!res.success) {
+        toast.error(res.message);
+      }
+    });
+  };
 
   return (
     <Form {...form}>
-      <form onSubmit={e => e.preventDefault()} className="grid grid-cols-2 gap-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-2 gap-6 items-start">
         <FormField
           control={form.control}
           name="type"
@@ -84,32 +127,7 @@ export default function TransactionForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-xs">Transaction Date</FormLabel>
-              <Popover open={open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        'w-full font-normal justify-start px-3 hover:bg-white',
-                        !field.value && 'text-muted-foreground'
-                      )}
-                    >
-                      {field.value ? format(field.value, 'd MMMM yyyy') : 'Pick a transaction date'}
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    defaultMonth={field.value}
-                    onSelect={selectedDate => {
-                      field.onChange(selectedDate);
-                      setOpen(false);
-                    }}
-                  />
-                </PopoverContent>
-              </Popover>
+              <DatePicker field={field} placeholder="Pick a transaction date" />
               <FormMessage className="text-xs" />
             </FormItem>
           )}
@@ -117,21 +135,22 @@ export default function TransactionForm() {
 
         <FormField
           control={form.control}
-          name="category"
+          name="categoryId"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-xs">Category</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                 <FormControl>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="food">Food</SelectItem>
-                  <SelectItem value="transportation">Transportation</SelectItem>
-                  <SelectItem value="shopping">Shopping</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
+                  {categories.map(category => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <FormMessage className="text-xs" />
@@ -152,11 +171,20 @@ export default function TransactionForm() {
             </FormItem>
           )}
         />
-        <div className="col-span-2 flex justify-between">
-          <Button variant="outline" asChild>
+        <div className="col-span-2 flex gap-6 justify-end">
+          <Button variant="outline" asChild className="w-32">
             <Link href="/transaction">Cancel</Link>
           </Button>
-          <Button>Create</Button>
+          <Button disabled={isPending} className="w-32">
+            {isPending ? (
+              <>
+                <Loader className="animate-spin" />
+                {type === 'create' ? 'Creating...' : 'Updating...'}
+              </>
+            ) : (
+              <>{type === 'create' ? 'Create' : 'Update'}</>
+            )}
+          </Button>
         </div>
       </form>
     </Form>

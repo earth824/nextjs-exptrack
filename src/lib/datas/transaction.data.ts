@@ -1,15 +1,51 @@
 import { getAuthUser } from '@/lib/auth';
 import prisma from '@/lib/db/prisma';
-import { SerializeTransactionWithCategory, TransactionWithCategory } from '@/types/transaction.type';
+import { simulateLoading } from '@/lib/utils';
+import { filterTransactionSchema } from '@/schemas/transaction.schema';
+import {
+  SerializeTransactionWithCategory,
+  TransactionFindManyArgs,
+  TransactionWhereInput,
+  TransactionWithCategory
+} from '@/types/transaction.type';
 
-export async function getTransactions(): Promise<TransactionWithCategory[]> {
+export async function getTransactions(filter?: unknown): Promise<TransactionWithCategory[]> {
   const user = await getAuthUser();
 
-  return prisma.transaction.findMany({
-    where: { userId: user.id },
-    orderBy: [{ date: 'desc' }, { updatedAt: 'desc' }],
-    include: { category: true }
-  });
+  const where: TransactionWhereInput = { userId: user.id };
+
+  const findArgs: TransactionFindManyArgs = {
+    where,
+    orderBy: [{ date: 'desc' }, { updatedAt: 'desc' }]
+  };
+
+  const { data, success } = filterTransactionSchema.safeParse(filter);
+
+  if (!success) return prisma.transaction.findMany({ ...findArgs, include: { category: true } });
+
+  const { search, type, categoryId, date_gte, date_lte } = data;
+
+  if (search) {
+    where.payee = { contains: search, mode: 'insensitive' };
+  }
+
+  if (type) {
+    if (type !== 'all') where.category = { type };
+  }
+
+  if (categoryId && categoryId !== 'all') {
+    where.categoryId = categoryId;
+  }
+
+  if (date_gte) {
+    where.date = { gte: new Date(date_gte) };
+  }
+
+  if (date_lte) {
+    where.date = { lte: new Date(date_lte) };
+  }
+
+  return prisma.transaction.findMany({ ...findArgs, include: { category: true } });
 }
 
 export async function getTransactionById(id: string): Promise<SerializeTransactionWithCategory | null> {

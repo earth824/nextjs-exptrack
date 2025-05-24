@@ -15,3 +15,13 @@ export const transactionFormSchema = z.object({
 export const insertOrUpdateTransactionSchema = transactionFormSchema.transform(
   ({ type, ...excludeType }) => excludeType
 );
+
+export const filterTransactionSchema = z
+  .object({
+    search: z.string(),
+    type: z.enum(['all', 'expense', 'income']),
+    categoryId: z.union([z.string().uuid(), z.literal('all')]),
+    date_gte: z.union([z.date(), z.string().date()]).nullable(),
+    date_lte: z.union([z.date(), z.string().date()]).nullable()
+  })
+  .partial();

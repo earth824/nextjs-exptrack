@@ -9,3 +9,7 @@ export async function getCategoriesMapByType(): Promise<{ expenses: Category[]; 
   const [expenses, incomes] = await Promise.all([getCategoriesByType('expense'), getCategoriesByType('income')]);
   return { expenses, incomes };
 }
+
+export async function getCategories() {
+  return prisma.category.findMany({ orderBy: [{ sequence: 'desc' }, { name: 'asc' }] });
+}

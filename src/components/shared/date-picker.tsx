@@ -41,6 +41,7 @@ export default function DatePicker<
             } else {
               field.onChange(selectedDate);
             }
+
             setOpen(false);
           }}
         />

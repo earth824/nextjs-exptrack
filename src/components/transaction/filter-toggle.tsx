@@ -21,7 +21,7 @@ type FilterToggleProps = {
 export default function FilterToggle({ categoriesPromise }: FilterToggleProps) {
   const [open, setOpen] = useState(false);
   const categories = use(categoriesPromise);
-  console.log(open);
+
   const close = () => {
     setOpen(false);
   };

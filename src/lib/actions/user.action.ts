@@ -5,7 +5,6 @@ import prisma from '@/lib/db/prisma';
 import { signUpExcludeConfirmSchema } from '@/schemas/auth.schema';
 import bcrypt from 'bcryptjs';
 import { CredentialsSignin } from 'next-auth';
-import { redirect } from 'next/navigation';
 
 export async function signUpCredentials(formInput: unknown) {
   try {
@@ -42,6 +41,5 @@ export async function signInCredentials(formInput: Record<string, unknown>) {
 }
 
 export async function signOutUser() {
-  await signOut();
-  redirect('/signin');
+  await signOut({ redirectTo: '/signin' });
 }

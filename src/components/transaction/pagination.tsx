@@ -11,13 +11,10 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
-export default function TransactionPagination({ total }: { total: number }) {
+export default function TransactionPagination({}: { total: number }) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
-
-  const page = searchParams.get('page') ? Number(searchParams.get('page')) : 1;
-  const numPage = Math.ceil(total / page);
 
   const handleChangeRowPerPage = (value: string) => {
     const newSearchParams = new URLSearchParams(searchParams);

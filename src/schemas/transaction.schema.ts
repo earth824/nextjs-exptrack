@@ -16,12 +16,14 @@ export const insertOrUpdateTransactionSchema = transactionFormSchema.transform(
   ({ type, ...excludeType }) => excludeType
 );
 
-export const filterTransactionSchema = z
-  .object({
-    search: z.string(),
-    type: z.enum(['all', 'expense', 'income']),
-    categoryId: z.union([z.string().uuid(), z.literal('all')]),
-    date_gte: z.union([z.date(), z.string().date()]).nullable(),
-    date_lte: z.union([z.date(), z.string().date()]).nullable()
-  })
-  .partial();
+export const filterTransactionSchema = z.object({
+  search: z.string(),
+  type: z.enum(['all', 'expense', 'income']),
+  category: z.union([z.string().uuid(), z.literal('all')]),
+  date_gte: z.union([z.date(), z.string().date()]).nullable(),
+  date_lte: z.union([z.date(), z.string().date()]).nullable(),
+  sort: z.enum(['default', 'amount', 'date', 'payee']),
+  order: z.enum(['default', 'asc', 'desc'])
+});
+
+export const OptionalFilterTransactionSchema = filterTransactionSchema.partial();

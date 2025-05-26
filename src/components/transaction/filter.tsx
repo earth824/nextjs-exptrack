@@ -2,13 +2,9 @@
 
 import DatePicker from '@/components/shared/date-picker';
 import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import { DialogClose } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
 import { filterTransactionSchema } from '@/schemas/transaction.schema';
 import { Category, FilterTransactionFormInput } from '@/types/transaction.type';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -26,20 +22,22 @@ export default function TransactionFilter({ close, categories }: TransactionFilt
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const initialType = (searchParams.get('type') as 'expense' | 'income') ?? 'all';
-  const date_gte = searchParams.get('date_gte');
-  const initialDate_gte = date_gte ? new Date(date_gte) : null;
-  const date_lte = searchParams.get('date_lte');
-  const initialDate_lte = date_lte ? new Date(date_lte) : null;
+  const initialType = searchParams.get('type');
+  const initialDateGte = searchParams.get('date_gte');
+  const initialDateLte = searchParams.get('date_lte');
+  const initialSort = searchParams.get('sort');
+  const initialOrder = searchParams.get('order');
 
   const form = useForm<FilterTransactionFormInput>({
     resolver: zodResolver(filterTransactionSchema),
     defaultValues: {
       search: searchParams.get('search') ?? '',
-      type: initialType,
-      categoryId: searchParams.get('categoryId') ?? 'all',
-      date_gte: initialDate_gte,
-      date_lte: initialDate_lte
+      type: initialType === 'income' || initialType === 'expense' ? initialType : 'all',
+      category: searchParams.get('category') ?? 'all',
+      date_gte: initialDateGte ? new Date(initialDateGte) : null,
+      date_lte: initialDateLte ? new Date(initialDateLte) : null,
+      sort: initialSort === 'amount' || initialSort === 'date' || initialSort === 'payee' ? initialSort : 'default',
+      order: initialOrder === 'asc' || initialOrder === 'desc' ? initialOrder : 'default'
     }
   });
 
@@ -51,16 +49,16 @@ export default function TransactionFilter({ close, categories }: TransactionFilt
       newSearchParams.delete('search');
     }
 
-    if (data.type && data.type !== 'all') {
+    if (data.type !== 'all') {
       newSearchParams.set('type', data.type);
     } else {
       newSearchParams.delete('type');
     }
 
-    if (data.categoryId && data.categoryId !== 'all') {
-      newSearchParams.set('categoryId', data.categoryId);
+    if (data.category !== 'all') {
+      newSearchParams.set('category', data.category);
     } else {
-      newSearchParams.delete('categoryId');
+      newSearchParams.delete('category');
     }
 
     if (data.date_gte) {
@@ -75,10 +73,20 @@ export default function TransactionFilter({ close, categories }: TransactionFilt
       newSearchParams.delete('date_lte');
     }
 
+    if (data.sort !== 'default') {
+      newSearchParams.set('sort', data.sort);
+      if (data.order === 'desc') {
+        newSearchParams.set('order', 'desc');
+      } else {
+        newSearchParams.delete('order');
+      }
+    } else {
+      newSearchParams.delete('sort');
+      newSearchParams.delete('order');
+    }
+
     close();
-    setTimeout(() => {
-      router.replace(`${pathname}?${newSearchParams.toString()}`);
-    }, 0);
+    router.replace(`${pathname}?${newSearchParams.toString()}`);
   };
 
   return (
@@ -121,7 +129,7 @@ export default function TransactionFilter({ close, categories }: TransactionFilt
 
         <FormField
           control={form.control}
-          name="categoryId"
+          name="category"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-xs">Category</FormLabel>
@@ -165,60 +173,35 @@ export default function TransactionFilter({ close, categories }: TransactionFilt
           )}
         />
 
-        {/* <FormField
-          control={form.control}
-          name="amount_min"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-xs">Amount</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter min amount" {...field} />
-              </FormControl>
-            </FormItem>
-          )}
-        /> */}
-
-        {/* <FormField
-          control={form.control}
-          name="amount_max"
-          render={({ field }) => (
-            <FormItem className="items-end">
-              <FormControl>
-                <Input placeholder="Enter max amount" {...field} />
-              </FormControl>
-            </FormItem>
-          )}
-        /> */}
-
-        {/* <FormField
+        <FormField
           control={form.control}
           name="sort"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-xs">Order By</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <FormLabel className="text-xs">Sort By</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                 <FormControl>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select order by" />
+                    <SelectValue placeholder="Select sort by" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="default">Default</SelectItem>
                   <SelectItem value="amount">Amount</SelectItem>
                   <SelectItem value="date">Date</SelectItem>
-                  <SelectItem value="price">Price</SelectItem>
+                  <SelectItem value="payee">Payee</SelectItem>
                 </SelectContent>
               </Select>
             </FormItem>
           )}
-        /> */}
+        />
 
-        {/* <FormField
+        <FormField
           control={form.control}
-          name="direction"
+          name="order"
           render={({ field }) => (
             <FormItem className="items-end">
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                 <FormControl>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select order direction" />
@@ -232,7 +215,7 @@ export default function TransactionFilter({ close, categories }: TransactionFilt
               </Select>
             </FormItem>
           )}
-        /> */}
+        />
 
         <div className="col-span-2 flex justify-between items-center">
           <Button>Search</Button>
@@ -240,7 +223,15 @@ export default function TransactionFilter({ close, categories }: TransactionFilt
             variant="outline"
             type="button"
             onClick={() => {
-              form.reset({ categoryId: 'all', type: 'all', search: '', date_gte: null, date_lte: null });
+              form.reset({
+                category: 'all',
+                type: 'all',
+                search: '',
+                date_gte: null,
+                date_lte: null,
+                sort: 'default',
+                order: 'default'
+              });
             }}
           >
             Reset

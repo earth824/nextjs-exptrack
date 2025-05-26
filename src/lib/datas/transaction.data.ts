@@ -1,7 +1,6 @@
 import { getAuthUser } from '@/lib/auth';
 import prisma from '@/lib/db/prisma';
-import { simulateLoading } from '@/lib/utils';
-import { filterTransactionSchema } from '@/schemas/transaction.schema';
+import { OptionalFilterTransactionSchema } from '@/schemas/transaction.schema';
 import {
   SerializeTransactionWithCategory,
   TransactionFindManyArgs,
@@ -19,31 +18,28 @@ export async function getTransactions(filter?: unknown): Promise<TransactionWith
     orderBy: [{ date: 'desc' }, { updatedAt: 'desc' }]
   };
 
-  const { data, success } = filterTransactionSchema.safeParse(filter);
+  const { data, success } = OptionalFilterTransactionSchema.safeParse(filter);
 
   if (!success) return prisma.transaction.findMany({ ...findArgs, include: { category: true } });
 
-  const { search, type, categoryId, date_gte, date_lte } = data;
+  const { search, type, category, date_gte, date_lte, sort, order } = data;
 
-  if (search) {
-    where.payee = { contains: search, mode: 'insensitive' };
-  }
+  if (search) where.payee = { contains: search, mode: 'insensitive' };
+  if (type && type !== 'all') where.category = { type };
+  if (category && category !== 'all') where.categoryId = category;
 
-  if (type) {
-    if (type !== 'all') where.category = { type };
-  }
-
-  if (categoryId && categoryId !== 'all') {
-    where.categoryId = categoryId;
-  }
-
+  const whereDate: TransactionWhereInput['date'] = {};
   if (date_gte) {
-    where.date = { gte: new Date(date_gte) };
+    whereDate.gte = new Date(date_gte);
+    where.date = whereDate;
+  }
+  if (date_lte) {
+    whereDate.lte = new Date(date_lte);
+    where.date = whereDate;
   }
 
-  if (date_lte) {
-    where.date = { lte: new Date(date_lte) };
-  }
+  if (sort && sort !== 'default')
+    findArgs.orderBy = [{ [sort]: order === 'desc' ? 'desc' : 'asc' }, { updatedAt: 'desc' }];
 
   return prisma.transaction.findMany({ ...findArgs, include: { category: true } });
 }

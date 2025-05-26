@@ -2,7 +2,6 @@
 
 import { getAuthUser } from '@/lib/auth';
 import prisma from '@/lib/db/prisma';
-import { simulateLoading } from '@/lib/utils';
 import { insertOrUpdateTransactionSchema } from '@/schemas/transaction.schema';
 import { ActionResult } from '@/types/action-result.type';
 import { TransactionFormInput } from '@/types/transaction.type';

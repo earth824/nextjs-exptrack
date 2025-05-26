@@ -52,11 +52,11 @@ export default function TransactionForm({ categoriesMap, type, action, transacti
 
   useEffect(() => {
     if (selectedType === 'expense') {
-      form.setValue('categoryId', transaction?.categoryId ?? expenses[0].id);
+      form.setValue('categoryId', transaction?.category.type === 'expense' ? transaction.categoryId : expenses[0].id);
     } else {
-      form.setValue('categoryId', transaction?.categoryId ?? incomes[0].id);
+      form.setValue('categoryId', transaction?.category.type === 'income' ? transaction.categoryId : incomes[0].id);
     }
-  }, [selectedType, expenses, incomes, form]);
+  }, [selectedType, expenses, incomes, form, transaction?.category.type, transaction?.categoryId]);
 
   const onSubmit: SubmitHandler<TransactionFormInput> = data => {
     startTransition(async () => {

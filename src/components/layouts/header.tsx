@@ -23,7 +23,7 @@ export default async function Header() {
     redirect('/signin');
   }
   return (
-    <header className="sticky border-b shadow">
+    <header className="sticky border-b">
       <div className="px-4 py-2 flex justify-between items-center max-w-7xl mx-auto w-full">
         <Link href="/">
           <Image src="/images/logo.png" width={40} height={40} alt={APP_NAME} />

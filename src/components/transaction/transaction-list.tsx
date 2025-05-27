@@ -1,9 +1,9 @@
+import TransactionPagination from '@/components/transaction/pagination';
 import TransactionItem from '@/components/transaction/transaction-item';
 import { Button } from '@/components/ui/button';
 import { getTotalTransactions, getTransactions } from '@/lib/datas/transaction.data';
 import { FilePlus2 } from 'lucide-react';
 import Link from 'next/link';
-import TransactionPagination from '@/components/transaction/pagination';
 
 type TransactionListProps = {
   query?: Partial<Record<string, string | undefined>>;

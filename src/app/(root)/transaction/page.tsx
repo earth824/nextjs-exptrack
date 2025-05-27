@@ -1,4 +1,5 @@
 import FilterToggle from '@/components/transaction/filter-toggle';
+import { TransactionListSkeleton } from '@/components/transaction/skeleton';
 import TransactionList from '@/components/transaction/transaction-list';
 import { Button } from '@/components/ui/button';
 import { getCategories } from '@/lib/datas/category.data';
@@ -6,6 +7,7 @@ import { getCategories } from '@/lib/datas/category.data';
 import { Plus } from 'lucide-react';
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'Transaction'
@@ -32,9 +34,9 @@ export default async function TransactionPage(props: TransactionPageProps) {
           </Button>
         </div>
       </div>
-      {/* <Suspense key={`${Math.random()}`} fallback={<>Loading...</>}> */}
-      <TransactionList query={searchParams} />
-      {/* </Suspense> */}
+      <Suspense key={`${Math.random()}`} fallback={<TransactionListSkeleton />}>
+        <TransactionList query={searchParams} />
+      </Suspense>
     </div>
   );
 }

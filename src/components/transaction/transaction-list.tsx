@@ -1,6 +1,6 @@
 import TransactionItem from '@/components/transaction/transaction-item';
 import { Button } from '@/components/ui/button';
-import { getTransactions } from '@/lib/datas/transaction.data';
+import { getTotalTransactions, getTransactions } from '@/lib/datas/transaction.data';
 import { FilePlus2 } from 'lucide-react';
 import Link from 'next/link';
 import TransactionPagination from '@/components/transaction/pagination';
@@ -10,7 +10,7 @@ type TransactionListProps = {
 };
 
 export default async function TransactionList({ query }: TransactionListProps) {
-  const transactions = await getTransactions(query);
+  const [transactions, total] = await Promise.all([getTransactions(query), getTotalTransactions(query)]);
 
   if (transactions.length === 0) {
     return (
@@ -34,10 +34,7 @@ export default async function TransactionList({ query }: TransactionListProps) {
           <TransactionItem key={transaction.id} transaction={transaction} />
         ))}
       </ul>
-      <div className="flex justify-between items-center pb-4">
-        <span className="text-muted-foreground text-sm">1 to 10 of 50 transactions</span>
-        <TransactionPagination total={transactions.length} />
-      </div>
+      <TransactionPagination total={total} />
     </>
   );
 }

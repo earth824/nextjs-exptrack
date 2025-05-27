@@ -26,4 +26,9 @@ export const filterTransactionSchema = z.object({
   order: z.enum(['default', 'asc', 'desc'])
 });
 
-export const OptionalFilterTransactionSchema = filterTransactionSchema.partial();
+export const filterTransactionWithPaginationSchema = filterTransactionSchema
+  .extend({
+    page: z.coerce.number().positive(),
+    limit: z.coerce.number().positive()
+  })
+  .partial();

@@ -85,6 +85,8 @@ export default function TransactionFilter({ close, categories }: TransactionFilt
       newSearchParams.delete('order');
     }
 
+    newSearchParams.delete('page');
+
     close();
     router.replace(`${pathname}?${newSearchParams.toString()}`);
   };

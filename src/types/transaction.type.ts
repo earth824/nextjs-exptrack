@@ -1,5 +1,9 @@
 import { Prisma } from '@/lib/db/generated/prisma';
-import { filterTransactionSchema, transactionFormSchema } from '@/schemas/transaction.schema';
+import {
+  filterTransactionSchema,
+  filterTransactionWithPaginationSchema,
+  transactionFormSchema
+} from '@/schemas/transaction.schema';
 import { z } from 'zod';
 
 export { type TransactionType, type Category, type Transaction } from '@/lib/db/generated/prisma';
@@ -14,3 +18,5 @@ export type FilterTransactionFormInput = z.infer<typeof filterTransactionSchema>
 
 export type TransactionWhereInput = Prisma.TransactionWhereInput;
 export type TransactionFindManyArgs = Prisma.TransactionFindManyArgs;
+
+export type FilterTransactionWithPagination = z.infer<typeof filterTransactionWithPaginationSchema>;

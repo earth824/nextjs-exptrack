@@ -1,4 +1,4 @@
-import { Category } from '@/lib/db/generated/prisma';
+import { Category } from '@prisma/client';
 
 export const categories: Omit<Category, 'id'>[] = [
   {

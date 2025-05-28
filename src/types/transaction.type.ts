@@ -1,4 +1,4 @@
-import { Prisma } from '@/lib/db/generated/prisma';
+import { Prisma } from '@prisma/client';
 import {
   filterTransactionSchema,
   filterTransactionWithPaginationSchema,
@@ -6,7 +6,7 @@ import {
 } from '@/schemas/transaction.schema';
 import { z } from 'zod';
 
-export { type TransactionType, type Category, type Transaction } from '@/lib/db/generated/prisma';
+export { type TransactionType, type Category, type Transaction } from '@prisma/client';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 const transactionWithCategory = Prisma.validator<Prisma.TransactionDefaultArgs>()({ include: { category: true } });

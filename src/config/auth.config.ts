@@ -5,7 +5,7 @@ import { NextAuthConfig } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { NextResponse } from 'next/server';
 
-const privateRoutes: RegExp[] = [/^\/$/, /\/transaction\/?.*/];
+const privateRoutes: RegExp[] = [/\/transaction\/?.*/];
 const redirectIfAuthRoutes: RegExp[] = [/\/signin/, /\/signup/];
 
 export const authConfig = {
@@ -36,7 +36,7 @@ export const authConfig = {
       }
 
       if (redirectIfAuthRoutes.some(route => route.test(request.nextUrl.pathname)) && auth) {
-        return NextResponse.redirect(new URL('/', request.url));
+        return NextResponse.redirect(new URL('/transaction', request.url));
       }
 
       return true;

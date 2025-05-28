@@ -1,5 +1,5 @@
-import Menu from '@/components/layouts/menu';
 import ThemeToggle from '@/components/shared/theme-toggle';
+import FilterToggle from '@/components/transaction/filter-toggle';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -12,7 +12,8 @@ import {
 import { APP_NAME } from '@/constants';
 import { signOutUser } from '@/lib/actions/user.action';
 import { auth } from '@/lib/auth';
-import { LogOutIcon } from 'lucide-react';
+import { getCategories } from '@/lib/datas/category.data';
+import { LogOutIcon, Plus } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -22,6 +23,9 @@ export default async function Header() {
   if (!session) {
     redirect('/signin');
   }
+
+  const categoriesPromise = getCategories();
+
   return (
     <header className="sticky border-b">
       <div className="px-4 py-2 flex justify-between items-center max-w-7xl mx-auto w-full">
@@ -29,7 +33,12 @@ export default async function Header() {
           <Image src="/images/logo.png" width={40} height={40} alt={APP_NAME} />
         </Link>
         <div className="flex items-center gap-4">
-          <Menu />
+          <FilterToggle categoriesPromise={categoriesPromise} />
+          <Button variant="ghost" asChild>
+            <Link href="/transaction/create">
+              <Plus />
+            </Link>
+          </Button>
           <ThemeToggle />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

@@ -9,7 +9,7 @@ import { filterTransactionSchema } from '@/schemas/transaction.schema';
 import { Category, FilterTransactionFormInput } from '@/types/transaction.type';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 type TransactionFilterProps = {
@@ -18,7 +18,6 @@ type TransactionFilterProps = {
 };
 
 export default function TransactionFilter({ close, categories }: TransactionFilterProps) {
-  const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -88,7 +87,7 @@ export default function TransactionFilter({ close, categories }: TransactionFilt
     newSearchParams.delete('page');
 
     close();
-    router.replace(`${pathname}?${newSearchParams.toString()}`);
+    router.replace(`/transaction?${newSearchParams.toString()}`);
   };
 
   return (

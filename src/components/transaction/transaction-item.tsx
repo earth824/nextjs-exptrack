@@ -20,7 +20,7 @@ export default function TransactionItem({ transaction }: TransactionItemProps) {
   return (
     <li
       className={cn(
-        'flex justify-between items-center border not-last:border-b-0 p-3 border-l-6',
+        'flex justify-between items-center border not-last:border-b-0 p-3 border-l-6 bg-card',
         type === 'expense' ? 'border-l-red-600' : 'border-l-green-600'
       )}
     >

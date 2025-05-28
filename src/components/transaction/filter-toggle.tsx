@@ -29,7 +29,7 @@ export default function FilterToggle({ categoriesPromise }: FilterToggleProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">
+        <Button variant="ghost">
           <Search />
         </Button>
       </DialogTrigger>

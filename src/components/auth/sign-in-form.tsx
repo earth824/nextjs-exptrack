@@ -41,7 +41,7 @@ export default function SignInForm() {
       }
       if (result.success) {
         toast.success(result.message);
-        const url = searchParams.get('callbackUrl') ?? '/';
+        const url = searchParams.get('callbackUrl') ?? '/transaction';
         router.push(url);
       }
     });

@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 
-export default function Error({ reset }: { reset: () => void }) {
+export default function Error() {
   return (
     <div className="min-h-screen flex flex-col justify-center items-center">
       <div className="text-center space-y-3">
@@ -13,9 +13,7 @@ export default function Error({ reset }: { reset: () => void }) {
         </p>
       </div>
       <div className="mt-8">
-        <Button variant="outline" onClick={reset}>
-          Try again
-        </Button>
+        <Button variant="outline">Try again</Button>
       </div>
     </div>
   );

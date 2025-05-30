@@ -1,11 +1,6 @@
 import AuthCard from '@/components/auth/auth-card';
 import SignInForm from '@/components/auth/sign-in-form';
-import { Metadata } from 'next';
 import Link from 'next/link';
-
-export const metadata: Metadata = {
-  title: 'Sign In'
-};
 
 export default function SignInPage() {
   return (

@@ -1,10 +1,4 @@
 import { Button } from '@/components/ui/button';
-import { Metadata } from 'next';
-import Link from 'next/link';
-
-export const metadata: Metadata = {
-  title: '404'
-};
 
 export default function NotFound() {
   return (
@@ -16,7 +10,7 @@ export default function NotFound() {
       </div>
       <div className="mt-8">
         <Button asChild variant="outline">
-          <Link href="/">Go Back Home</Link>
+          <a>Go Back Home</a>
         </Button>
       </div>
     </div>

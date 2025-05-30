@@ -1,18 +1,11 @@
 import TransactionPagination from '@/components/transaction/pagination';
 import TransactionItem from '@/components/transaction/transaction-item';
 import { Button } from '@/components/ui/button';
-import { getTotalTransactions, getTransactions } from '@/lib/datas/transaction.data';
 import { FilePlus2 } from 'lucide-react';
 import Link from 'next/link';
 
-type TransactionListProps = {
-  query?: Partial<Record<string, string | undefined>>;
-};
-
-export default async function TransactionList({ query }: TransactionListProps) {
-  const [transactions, total] = await Promise.all([getTransactions(query), getTotalTransactions(query)]);
-
-  if (transactions.length === 0) {
+export default async function TransactionList() {
+  if (false) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center gap-4">
         <FilePlus2 className="w-24 h-24" />
@@ -30,11 +23,9 @@ export default async function TransactionList({ query }: TransactionListProps) {
   return (
     <>
       <ul>
-        {transactions.map(transaction => (
-          <TransactionItem key={transaction.id} transaction={transaction} />
-        ))}
+        <TransactionItem />
       </ul>
-      <TransactionPagination total={total} />
+      <TransactionPagination />
     </>
   );
 }

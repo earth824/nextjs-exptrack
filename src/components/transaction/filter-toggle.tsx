@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -8,19 +9,11 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog';
-import TransactionFilter from '@/components/transaction/filter';
-import { Button } from '@/components/ui/button';
 import { Search } from 'lucide-react';
-import { use, useState } from 'react';
-import { Category } from '@/types/transaction.type';
+import { useState } from 'react';
 
-type FilterToggleProps = {
-  categoriesPromise: Promise<Category[]>;
-};
-
-export default function FilterToggle({ categoriesPromise }: FilterToggleProps) {
+export default function FilterToggle() {
   const [open, setOpen] = useState(false);
-  const categories = use(categoriesPromise);
 
   const close = () => {
     setOpen(false);
@@ -38,7 +31,7 @@ export default function FilterToggle({ categoriesPromise }: FilterToggleProps) {
           <DialogTitle className="text-2xl">Search</DialogTitle>
           <DialogDescription>Complete the form below to apply filters and refine your search.</DialogDescription>
         </DialogHeader>
-        <TransactionFilter close={close} categories={categories} />
+        {/* <TransactionFilter /> */}
       </DialogContent>
     </Dialog>
   );

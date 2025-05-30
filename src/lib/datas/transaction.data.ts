@@ -1,4 +1,3 @@
-import { getAuthUser } from '@/lib/auth';
 import prisma from '@/lib/db/prisma';
 import { filterTransactionWithPaginationSchema } from '@/schemas/transaction.schema';
 import {
@@ -10,10 +9,9 @@ import {
 } from '@/types/transaction.type';
 
 export async function getTransactions(filter?: unknown): Promise<TransactionWithCategory[]> {
-  const user = await getAuthUser();
   const defaultLimit = 5;
 
-  const where: TransactionWhereInput = { userId: user.id };
+  const where: TransactionWhereInput = { userId: '' };
 
   const findArgs: TransactionFindManyArgs = {
     where,
@@ -44,11 +42,10 @@ export async function getTransactions(filter?: unknown): Promise<TransactionWith
 }
 
 export async function getTotalTransactions(filter?: unknown): Promise<number> {
-  const user = await getAuthUser();
   const { data, success } = filterTransactionWithPaginationSchema.safeParse(filter);
-  if (!success) return prisma.transaction.count({ where: { userId: user.id } });
+  if (!success) return prisma.transaction.count({ where: { userId: '' } });
   const whereFilter = getWhereFilter(data);
-  return prisma.transaction.count({ where: { userId: user.id, ...whereFilter } });
+  return prisma.transaction.count({ where: { userId: '', ...whereFilter } });
 }
 
 function getWhereFilter(data: FilterTransactionWithPagination): TransactionWhereInput {
@@ -73,10 +70,8 @@ function getWhereFilter(data: FilterTransactionWithPagination): TransactionWhere
 }
 
 export async function getTransactionById(id: string): Promise<SerializeTransactionWithCategory | null> {
-  const user = await getAuthUser();
-
   const transaction = await prisma.transaction.findUnique({
-    where: { id, userId: user.id },
+    where: { id, userId: '' },
     include: { category: true }
   });
   if (transaction) {

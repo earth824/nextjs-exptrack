@@ -6,12 +6,7 @@ export const metadata: Metadata = {
   title: 'Create Transaction'
 };
 
-type EditTransactionPageProps = {
-  searchParams: Promise<{ id?: string }>;
-};
-
-export default async function CreateTransactionPage({ searchParams }: EditTransactionPageProps) {
-  const { id } = await searchParams;
+export default async function CreateTransactionPage() {
   return (
     <div className="flex flex-col gap-4 h-full">
       <h1 className="text-2xl text-muted-foreground">Transaction</h1>
@@ -20,9 +15,7 @@ export default async function CreateTransactionPage({ searchParams }: EditTransa
           <CardTitle className="text-xl">Create transaction</CardTitle>
           <CardDescription>Fill out the form to create a new transaction.</CardDescription>
         </CardHeader>
-        <CardContent>
-          <TransactionFormLoader type="create" transactionId={id} />
-        </CardContent>
+        <CardContent>{/* <TransactionFormLoader /> */}</CardContent>
       </Card>
     </div>
   );

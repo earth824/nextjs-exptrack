@@ -6,7 +6,7 @@ export type SuccessResult = {
 export type ErrorResult = {
   success: false;
   message: string;
-  error?: Record<string, string>;
+  error?: Record<string, string> | Record<string, string[]>;
 };
 
 export type ActionResult = SuccessResult | ErrorResult;

@@ -8,18 +8,17 @@ import { useEffect, useState } from 'react';
 
 export default function ThemeToggle() {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    setIsMounted(true);
   }, []);
 
-  if (!mounted) return <Skeleton className="w-10 h-9" />;
+  if (!isMounted) return null;
 
   return (
-    <Button variant="ghost" onClick={() => setTheme(prev => (prev === 'light' ? 'dark' : 'light'))}>
-      {theme === 'light' && <Moon />}
-      {theme === 'dark' && <Sun />}
+    <Button variant="ghost" onClick={() => setTheme(prev => (prev === 'dark' ? 'light' : 'dark'))}>
+      {theme === 'dark' ? <Sun /> : <Moon />}
     </Button>
   );
 }

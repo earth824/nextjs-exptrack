@@ -11,7 +11,7 @@ import { EllipsisVertical } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
-export default function TransactionItemAction() {
+export default function TransactionItemAction({ id }: { id: string }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -28,7 +28,7 @@ export default function TransactionItemAction() {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <Link href="" className="w-full">
+          <Link href={`/transaction/${id}/edit`} className="w-full">
             Edit
           </Link>
         </DropdownMenuItem>

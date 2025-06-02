@@ -6,7 +6,12 @@ export const metadata: Metadata = {
   title: 'Edit Transaction'
 };
 
-export default async function EditTransactionPage() {
+type Props = {
+  params: Promise<{ transactionId: string }>;
+};
+
+export default async function EditTransactionPage({ params }: Props) {
+  const { transactionId } = await params;
   return (
     <div className="flex flex-col gap-4 h-full">
       <h1 className="text-2xl text-muted-foreground">Transaction</h1>
@@ -15,7 +20,9 @@ export default async function EditTransactionPage() {
           <CardTitle className="text-xl">Edit transaction</CardTitle>
           <CardDescription>Fill out the form to update your transaction.</CardDescription>
         </CardHeader>
-        <CardContent>{/* <TransactionFormLoader /> */}</CardContent>
+        <CardContent>
+          <TransactionFormLoader id={transactionId} />
+        </CardContent>
       </Card>
     </div>
   );

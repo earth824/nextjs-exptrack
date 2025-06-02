@@ -6,8 +6,10 @@ import { Input } from '@/components/ui/input';
 import { signInCredentials } from '@/lib/actions/user.action';
 import { signInSchema } from '@/schemas/auth.schema';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
 type FormInput = z.infer<typeof signInSchema>;
@@ -20,9 +22,20 @@ export default function SignInForm() {
 
   const [isPending, startTransition] = useTransition();
 
+  const router = useRouter();
+
   const onSubmit: SubmitHandler<FormInput> = data => {
     startTransition(async () => {
-      await signInCredentials(data);
+      const result = await signInCredentials(data);
+      console.log(result);
+      if (result.success) {
+        toast.success(result.message);
+        router.push('/transaction');
+      } else {
+        form.setError('email', { message: result.message });
+        form.setError('password', { message: result.message });
+        toast.error(result.message);
+      }
     });
   };
 

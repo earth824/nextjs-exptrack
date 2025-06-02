@@ -1,11 +1,15 @@
 import TransactionPagination from '@/components/transaction/pagination';
 import TransactionItem from '@/components/transaction/transaction-item';
 import { Button } from '@/components/ui/button';
+import { getTransactions } from '@/lib/datas/transaction.data';
+import { simulateLoading } from '@/lib/utils';
 import { FilePlus2 } from 'lucide-react';
 import Link from 'next/link';
 
 export default async function TransactionList() {
-  if (false) {
+  const transactions = await getTransactions();
+
+  if (transactions.length === 0) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center gap-4">
         <FilePlus2 className="w-24 h-24" />
@@ -23,7 +27,9 @@ export default async function TransactionList() {
   return (
     <>
       <ul>
-        <TransactionItem />
+        {transactions.map(tran => (
+          <TransactionItem key={tran.id} transaction={tran} />
+        ))}
       </ul>
       <TransactionPagination />
     </>

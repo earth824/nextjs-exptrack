@@ -1,3 +1,4 @@
+import { auth, authenticateUser } from '@/lib/auth';
 import prisma from '@/lib/db/prisma';
 import { filterTransactionWithPaginationSchema } from '@/schemas/transaction.schema';
 import {
@@ -7,11 +8,14 @@ import {
   TransactionWhereInput,
   TransactionWithCategory
 } from '@/types/transaction.type';
+import { redirect } from 'next/navigation';
 
 export async function getTransactions(filter?: unknown): Promise<TransactionWithCategory[]> {
+  const user = await authenticateUser();
+
   const defaultLimit = 5;
 
-  const where: TransactionWhereInput = { userId: '' };
+  const where: TransactionWhereInput = { userId: user.id };
 
   const findArgs: TransactionFindManyArgs = {
     where,
@@ -70,8 +74,9 @@ function getWhereFilter(data: FilterTransactionWithPagination): TransactionWhere
 }
 
 export async function getTransactionById(id: string): Promise<SerializeTransactionWithCategory | null> {
+  const user = await authenticateUser();
   const transaction = await prisma.transaction.findUnique({
-    where: { id, userId: '' },
+    where: { id, userId: user.id },
     include: { category: true }
   });
   if (transaction) {

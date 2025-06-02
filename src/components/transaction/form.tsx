@@ -5,16 +5,72 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Select, SelectContent, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { transactionFormSchema } from '@/schemas/transaction.schema';
+import { ActionResult } from '@/types/action-result.type';
+import {
+  SerializeTransactionWithCategory,
+  TransactionFormInput,
+  TransactionWithCategory
+} from '@/types/transaction.type';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Category } from '@prisma/client';
 import Link from 'next/link';
-import { useForm } from 'react-hook-form';
+import { useEffect } from 'react';
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form';
 
-export default function TransactionForm() {
-  const form = useForm();
+type CreateFormProps = {
+  type: 'create';
+  action: (data: TransactionFormInput) => Promise<ActionResult>;
+};
+
+type UpdateFormProps = {
+  type: 'update';
+  action: (id: string, data: TransactionFormInput) => Promise<ActionResult>;
+  transaction: SerializeTransactionWithCategory;
+};
+
+type TransactionFormProps = {
+  categoryMap: { expenses: Category[]; incomes: Category[] };
+} & (CreateFormProps | UpdateFormProps);
+
+export default function TransactionForm(props: TransactionFormProps) {
+  const { categoryMap, action, type } = props;
+  const { expenses, incomes } = categoryMap;
+  const form = useForm<TransactionFormInput>({
+    resolver: zodResolver(transactionFormSchema),
+    defaultValues: {
+      type: type === 'update' ? props.transaction.category.type : 'expense',
+      payee: type === 'update' ? props.transaction.payee : '',
+      amount: type === 'update' ? props.transaction.amount : '',
+      date: type === 'update' ? props.transaction.date : new Date(),
+      categoryId: type === 'update' ? props.transaction.categoryId : expenses[0].id
+    }
+  });
+
+  const selectedType = useWatch({ control: form.control, name: 'type' });
+
+  useEffect(() => {
+    if (selectedType === 'expense') {
+      form.setValue('categoryId', expenses[0].id);
+    } else {
+      form.setValue('categoryId', incomes[0].id);
+    }
+  }, [selectedType]);
+
+  const categories = form.getValues('type') === 'expense' ? expenses : incomes;
+
+  const onSubmit: SubmitHandler<TransactionFormInput> = async data => {
+    if (type === 'create') {
+      await action(data);
+    } else {
+      await action(props.transaction.id, data);
+    }
+  };
 
   return (
     <Form {...form}>
-      <form className="grid grid-cols-2 gap-6 items-start">
+      <form className="grid grid-cols-2 gap-6 items-start" onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
           name="type"
@@ -96,7 +152,13 @@ export default function TransactionForm() {
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>{/* <SelectItem></SelectItem> */}</SelectContent>
+                <SelectContent>
+                  {categories.map(cat => (
+                    <SelectItem key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
               </Select>
               <FormMessage className="text-xs" />
             </FormItem>
@@ -120,7 +182,7 @@ export default function TransactionForm() {
           <Button variant="outline" asChild className="w-32">
             <Link href="/transaction">Cancel</Link>
           </Button>
-          <Button className="w-32">Create</Button>
+          <Button className="w-32">{type === 'create' ? 'Create' : 'Update'}</Button>
         </div>
       </form>
     </Form>

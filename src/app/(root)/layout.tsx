@@ -1,6 +1,12 @@
 import Header from '@/components/layouts/header';
+import { auth } from '@/lib/auth';
+import { redirect } from 'next/navigation';
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth();
+
+  if (!session) redirect('/signin');
+
   return (
     <div className="flex flex-col h-screen">
       <Header />
